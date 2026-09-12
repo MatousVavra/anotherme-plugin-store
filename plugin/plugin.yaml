@@ -1,0 +1,14 @@
+name: store
+version: 0.1.0
+description: Browse, install, update, and remove community plugins
+author: AnotherMe
+entrypoint: plugin
+capabilities:
+  - routes
+  - ui
+dependencies: []
+ui:
+  tab: Store
+  icon: plugins
+  order: 5
+  component: true
