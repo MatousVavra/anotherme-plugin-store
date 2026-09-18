@@ -12,3 +12,4 @@ ui:
   icon: plugins
   order: 5
   component: true
+tables: []
