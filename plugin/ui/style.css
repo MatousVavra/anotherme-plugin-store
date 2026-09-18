@@ -1,23 +1,139 @@
-.store-plugin { padding: 1.5rem; }
-.store-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.store-header h2 { margin: 0; flex: 1; }
-.store-stale { font-size: 0.8rem; opacity: 0.7; font-style: italic; }
-.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-.store-card { border: 1px solid rgba(128,128,128,0.25); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-.store-card.installed { border-color: rgba(80,200,120,0.5); }
-.store-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
-.store-tag { font-size: 0.75rem; opacity: 0.7; }
-.store-desc { margin: 0; font-size: 0.9rem; opacity: 0.85; flex: 1; }
-.store-meta { display: flex; gap: 0.75rem; font-size: 0.75rem; opacity: 0.7; flex-wrap: wrap; }
-.store-bundled { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.65rem; }
-.store-actions { display: flex; gap: 0.5rem; }
-.store-empty { grid-column: 1 / -1; opacity: 0.6; text-align: center; padding: 2rem; }
-.store-sideload { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(128,128,128,0.25); }
-.store-sideload form { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-.store-sideload input { flex: 1; }
-.store-warning { color: #e2a03f; font-size: 0.85rem; }
-.store-error { color: #e05252; font-size: 0.9rem; font-weight: 500; margin: 0 0 1rem; }
-.store-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.store-modal-box { background: var(--bg, #1e1e1e); border-radius: 12px; padding: 1.5rem; max-width: 480px; width: 90%; }
-.store-modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
-[x-cloak] { display: none !important; }
+.store-plugin { padding: 32px 24px; overflow-y: auto; height: 100%; }
+.store-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.store-header h2 { margin: 0; flex: 1; font-size: 20px; }
+.store-stale { font-size: 12px; color: var(--muted); font-style: italic; }
+.store-search {
+  width: 220px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+.store-search:focus { outline: none; border-color: var(--accent); }
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.store-card {
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.store-card.installed { border-color: var(--success); }
+.store-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.store-tag {
+  font-size: 10px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.store-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.85;
+  flex: 1;
+}
+.store-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.store-bundled { text-transform: uppercase; letter-spacing: 0.05em; }
+.store-actions { display: flex; gap: 8px; align-items: center; }
+.store-repo-link {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.store-repo-link:hover { color: var(--accent); }
+.store-empty { grid-column: 1 / -1; color: var(--muted); text-align: center; padding: 32px 0; font-size: 14px; }
+
+.store-plugin .btn-primary,
+.store-plugin .btn-secondary,
+.store-plugin .btn-danger,
+.store-confirm-actions .btn-primary,
+.store-confirm-actions .btn-secondary,
+.store-confirm-actions .btn-danger {
+  padding: 5px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  background: none;
+}
+.store-plugin .btn-primary,
+.store-confirm-actions .btn-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--ink);
+}
+.store-plugin .btn-primary:hover,
+.store-confirm-actions .btn-primary:hover { background: var(--warm); border-color: var(--warm); }
+.store-plugin .btn-primary:disabled,
+.store-plugin .btn-secondary:disabled,
+.store-plugin .btn-danger:disabled,
+.store-confirm-actions .btn-primary:disabled,
+.store-confirm-actions .btn-secondary:disabled,
+.store-confirm-actions .btn-danger:disabled { opacity: 0.5; cursor: default; }
+.store-plugin .btn-primary:disabled:hover,
+.store-confirm-actions .btn-primary:disabled:hover { background: var(--accent); border-color: var(--accent); }
+.store-plugin .btn-secondary,
+.store-confirm-actions .btn-secondary {
+  border-color: var(--border);
+  color: var(--muted);
+}
+.store-plugin .btn-secondary:hover,
+.store-confirm-actions .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.store-plugin .btn-secondary:disabled:hover,
+.store-confirm-actions .btn-secondary:disabled:hover { border-color: var(--border); color: var(--muted); }
+.store-plugin .btn-danger,
+.store-confirm-actions .btn-danger {
+  border-color: var(--border);
+  color: var(--error);
+}
+.store-plugin .btn-danger:hover,
+.store-confirm-actions .btn-danger:hover { border-color: var(--error); background: var(--error); color: var(--ink); }
+.store-plugin .btn-danger:disabled:hover,
+.store-confirm-actions .btn-danger:disabled:hover { border-color: var(--border); background: none; color: var(--error); }
+
+.store-sideload { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+.store-sideload h3 { margin: 0 0 8px; font-size: 14px; }
+.store-sideload form { display: flex; gap: 8px; margin-top: 10px; }
+.store-url-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+.store-url-input:focus { outline: none; border-color: var(--accent); }
+
+.store-warning { color: var(--warm); font-size: 13px; }
+.store-confirm-text { font-size: 14px; margin: 4px 0 16px; word-break: break-all; }
+.store-confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.store-confirm-actions .btn-secondary { border-color: var(--border); color: var(--muted); }
+.store-confirm-actions .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 768px) {
+  .store-plugin { padding: 20px 16px; }
+  .store-header { flex-wrap: wrap; }
+  .store-header h2 { flex-basis: 100%; }
+  .store-search { width: 100%; }
+}

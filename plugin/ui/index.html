@@ -1,16 +1,14 @@
-<div class="store-plugin" x-data="storePlugin()" x-init="init()">
+<div class="store-plugin" x-data="storePlugin()">
     <header class="store-header">
         <h2>Community Plugins</h2>
-        <span class="store-stale" x-show="stale">Offline — showing cached list</span>
-        <button class="btn-secondary" @click="refresh()" :disabled="loading">
-            Refresh
-        </button>
+        <span class="store-stale" x-show="stale">Offline &mdash; showing cached list</span>
+        <input type="search" class="store-search" x-model="search" placeholder="Search plugins&hellip;">
+        <button class="btn-secondary" @click="refresh()" :disabled="loading"
+                x-text="loading ? 'Refreshing\u2026' : 'Refresh'"></button>
     </header>
 
-    <p class="store-error" x-show="errorMessage" x-text="errorMessage"></p>
-
     <div class="store-grid">
-        <template x-for="p in plugins" :key="p.name">
+        <template x-for="p in filteredPlugins" :key="p.name">
             <div class="store-card" :class="{ installed: p.installed }">
                 <div class="store-card-head">
                     <strong x-text="p.name"></strong>
@@ -20,19 +18,28 @@
                 <div class="store-meta">
                     <span x-text="`by ${p.author}`"></span>
                     <span x-show="p.installed"
-                          x-text="`installed: ${p.installed_version}`"></span>
+                          x-text="`installed ${p.installed_version} \u00b7 available ${p.tag}`"></span>
+                    <span x-show="!p.installed" x-text="`available ${p.tag}`"></span>
                     <span class="store-bundled" x-show="p.bundled">bundled</span>
                 </div>
                 <div class="store-actions">
                     <button x-show="!p.installed" class="btn-primary"
-                            @click="install(p)" :disabled="loading">Install</button>
+                            @click="install(p)" :disabled="busy[p.name]"
+                            x-text="busy[p.name] === 'installing' ? 'Installing\u2026' : 'Install'"></button>
                     <button x-show="p.update_available" class="btn-primary"
-                            @click="update(p)" :disabled="loading">Update</button>
+                            @click="update(p)" :disabled="busy[p.name]"
+                            x-text="busy[p.name] === 'updating' ? 'Updating\u2026' : 'Update'"></button>
                     <button x-show="p.installed && !p.bundled" class="btn-danger"
-                            @click="uninstall(p)" :disabled="loading">Remove</button>
+                            @click="uninstall(p)" :disabled="busy[p.name]"
+                            x-text="busy[p.name] === 'removing' ? 'Removing\u2026' : 'Remove'"></button>
+                    <a class="store-repo-link" x-show="p.repo"
+                       :href="`https://github.com/${p.repo}`" target="_blank" rel="noopener">GitHub</a>
                 </div>
             </div>
         </template>
+        <p x-show="!loading && plugins.length > 0 && filteredPlugins.length === 0" class="store-empty">
+            No plugins match your search.
+        </p>
         <p x-show="!loading && plugins.length === 0" class="store-empty">
             No community plugins published yet.
         </p>
@@ -41,27 +48,13 @@
     <div class="store-sideload">
         <h3>Install from URL</h3>
         <p class="store-warning">
-            Unreviewed code — it will run with full access to your vault and AI keys.
+            Unreviewed code &mdash; it will run with full access to your vault and AI keys.
             Only continue if you trust the source.
         </p>
         <form @submit.prevent="sideload()">
-            <input type="url" x-model="sideloadUrl" placeholder="https://..." required>
-            <button type="submit" class="btn-danger" :disabled="loading">Install</button>
+            <input type="url" class="store-url-input" x-model="sideloadUrl" placeholder="https://..." required>
+            <button type="submit" class="btn-danger" :disabled="sideloadBusy"
+                    x-text="sideloadBusy ? 'Installing\u2026' : 'Install'"></button>
         </form>
-    </div>
-
-    <div class="store-modal" x-show="confirmUrl !== null" x-cloak>
-        <div class="store-modal-box">
-            <h3>Install unreviewed plugin?</h3>
-            <p x-text="confirmUrl"></p>
-            <p class="store-warning">
-                This plugin was not reviewed. It will run with full access to your
-                vault and AI keys. Only continue if you trust this source.
-            </p>
-            <div class="store-modal-actions">
-                <button class="btn-secondary" @click="confirmUrl = null">Cancel</button>
-                <button class="btn-danger" @click="confirmSideload()">Install anyway</button>
-            </div>
-        </div>
     </div>
 </div>

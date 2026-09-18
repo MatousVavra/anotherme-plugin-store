@@ -1,5 +1,5 @@
 name: store
-version: 0.1.0
+version: 0.1.1
 description: Browse, install, update, and remove community plugins
 author: AnotherMe
 entrypoint: plugin

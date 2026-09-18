@@ -35,6 +35,8 @@ class Plugin:
                 return await asyncio.to_thread(self._list)
             except ValueError as e:
                 raise HTTPException(503, f"community index unavailable: {e}")
+            except Exception as e:
+                raise HTTPException(502, f"Failed to list plugins: {e}")
 
         @router.post("/install")
         async def install(req: InstallRequest):
@@ -49,14 +51,20 @@ class Plugin:
                 if "already installed" in msg:
                     raise HTTPException(409, msg)
                 raise HTTPException(422, msg)
+            except Exception as e:
+                raise HTTPException(502, f"Install failed: {e}")
             return {"name": pkg.name, "version": pkg.version, "reviewed": True}
 
         @router.post("/install-url")
         async def install_url(req: UrlRequest):
+            if not req.url.startswith("https://"):
+                raise HTTPException(422, "Only https:// URLs are supported")
             try:
                 pkg = await asyncio.to_thread(self._pm.install_from_url, req.url)
             except ValueError as e:
                 raise HTTPException(422, str(e))
+            except Exception as e:
+                raise HTTPException(502, f"Install failed: {e}")
             return {"name": pkg.name, "version": pkg.version, "reviewed": False}
 
         @router.post("/update")
@@ -74,6 +82,8 @@ class Plugin:
                 if "bundled" in msg:
                     raise HTTPException(400, msg)
                 raise HTTPException(422, msg)
+            except Exception as e:
+                raise HTTPException(502, f"Update failed: {e}")
             return {"name": pkg.name, "version": pkg.version}
 
         @router.post("/uninstall")
@@ -89,6 +99,8 @@ class Plugin:
                 if "bundled" in msg:
                     raise HTTPException(400, msg)
                 raise HTTPException(422, msg)
+            except Exception as e:
+                raise HTTPException(502, f"Uninstall failed: {e}")
             return {"uninstalled": req.name}
 
         @router.post("/refresh")
@@ -97,6 +109,8 @@ class Plugin:
                 await asyncio.to_thread(self._pm.fetch_index, True)
             except ValueError as e:
                 raise HTTPException(503, f"community index unavailable: {e}")
+            except Exception as e:
+                raise HTTPException(502, f"Refresh failed: {e}")
             return await asyncio.to_thread(self._list)
 
         ctx.register_router(router)
@@ -116,6 +130,7 @@ class Plugin:
                 "description": e.description,
                 "author": e.author,
                 "tag": e.tag,
+                "repo": e.repo,
                 "installed": pkg is not None,
                 "installed_version": pkg.version if pkg else None,
                 "update_available": bool(
